@@ -1,0 +1,126 @@
+=====================================================
+root@10.3.0.41
+=====================================================
+CPU
+
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 42
+model name	: Intel(R) Core(TM) i3-2120 CPU @ 3.30GHz
+stepping	: 7
+cpu MHz		: 1600.000
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 2
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall rdtscp lm constant_tsc arch_perfmon pebs bts rep_good xtopology tsc_reliable nonstop_tsc aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 sse4_2 popcnt xsave avx lahf_lm arat tpr_shadow vnmi flexpriority ept vpid
+bogomips	: 6585.74
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+
+=====================================================
+Linux
+
+Linux version 2.6.32 (root@localhost.localdomain) (gcc version 4.4.7 20120313 (Red Hat 4.4.7-3) (GCC) ) #10 SMP Fri May 15 00:47:13 CST 2015
+
+=====================================================
+Experimental result
+
+/*10.3.0.41这台机器的cache size是3M左右。我在实验过程中开辟了128M的页面，每个页面均初始化为0,以保证计算hash，比较，拷贝等操作在执行时page不在cache中。
+copy page操作中，我用了三种不同的方法拷贝页面。
+方法1：对于32768个页面，第32768个页面拷贝给第1个页面，第32767个页面拷贝给第2个页面，以此类推。
+方法2：只进行一组页面的拷贝。
+方法3：在32768个页面的16348次拷贝中，每次用随机函数生成两个随机数，将这两个页面作为一组，进行拷贝操作。
+3种方法的结果相差不大，综合来看，拷贝页面需要10^3ns即1us左右。
+*/
+
+[1]Get page hash value: 10^2ns (120ns)
+
+[2]Get cacheline hash value: 10^2ns (100ns)
+
+[3]Compare the similarity of two pages: 10^3ns (4452ns)
+
+[4]copy page:(10次实验结果)
+=========================================
+Method 1:sequence copy(ns)	822
+Method 2:signal copy(ns)	1248
+Method 3:random copy(ns)	815
+=========================================
+Method 1:sequence copy(ns)	822
+Method 2:signal copy(ns)	1155
+Method 3:random copy(ns)	813
+=========================================
+Method 1:sequence copy(ns)	825
+Method 2:signal copy(ns)	910
+Method 3:random copy(ns)	823
+=========================================
+Method 1:sequence copy(ns)	824
+Method 2:signal copy(ns)	879
+Method 3:random copy(ns)	814
+=========================================
+Method 1:sequence copy(ns)	605
+Method 2:signal copy(ns)	689
+Method 3:random copy(ns)	546
+=========================================
+Method 1:sequence copy(ns)	823
+Method 2:signal copy(ns)	897
+Method 3:random copy(ns)	819
+=========================================
+Method 1:sequence copy(ns)	604
+Method 2:signal copy(ns)	862
+Method 3:random copy(ns)	548
+=========================================
+Method 1:sequence copy(ns)	825
+Method 2:signal copy(ns)	907
+Method 3:random copy(ns)	821
+=========================================
+Method 1:sequence copy(ns)	826
+Method 2:signal copy(ns)	1291
+Method 3:random copy(ns)	826
+=========================================
+Method 1:sequence copy(ns)	584
+Method 2:signal copy(ns)	587
+Method 3:random copy(ns)	545
+=========================================
+
+[5]Copy partial page to another:
+1 cachelines(ns)	187
+2 cachelines(ns)	85
+3 cachelines(ns)	218
+4 cachelines(ns)	195
+5 cachelines(ns)	148
+6 cachelines(ns)	166
+7 cachelines(ns)	233
+8 cachelines(ns)	278
+9 cachelines(ns)	258
+10 cachelines(ns)	276
+11 cachelines(ns)	288
+12 cachelines(ns)	314
+13 cachelines(ns)	323
+14 cachelines(ns)	338
+15 cachelines(ns)	389
+16 cachelines(ns)	393
+17 cachelines(ns)	428
+18 cachelines(ns)	452
+19 cachelines(ns)	417
+20 cachelines(ns)	479
+21 cachelines(ns)	424
+22 cachelines(ns)	569
+23 cachelines(ns)	569
+24 cachelines(ns)	584
+25 cachelines(ns)	604
+26 cachelines(ns)	616
+27 cachelines(ns)	648
+28 cachelines(ns)	667
+29 cachelines(ns)	697
+30 cachelines(ns)	725
+31 cachelines(ns)	723
