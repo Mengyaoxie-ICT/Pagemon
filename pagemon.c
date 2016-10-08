@@ -383,3 +383,5 @@ static int CopyPartialPage(void)
 
 module_init(timer_init);
 module_exit(timer_exit);
+MODULE_AUTHOR("mengyao xie");
+MODULE_LICENSE("GPL");
